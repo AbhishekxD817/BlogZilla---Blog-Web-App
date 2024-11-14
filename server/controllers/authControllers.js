@@ -19,7 +19,6 @@ const SendResponse = async (res, status, message) => {
 }
 
 export const signup = async (req, res, next) => {
-    console.log("signup fn() running...")
 
     // check if user with same email, or username already exists or not
     let userExists = await User.findOne({ $or: [{ email: req.body.email }, { username: req.body.username }] });
@@ -42,7 +41,6 @@ export const signup = async (req, res, next) => {
     return SendResponse(res, 200, "Singup Successfull");
 }
 export const login = async (req, res, next) => {
-    console.log("login fn() running...")
 
     let { username, email, password } = req.body;
 
@@ -67,14 +65,12 @@ export const login = async (req, res, next) => {
     return SendResponse(res, 200, "Login Successfull");
 }
 export const logout = async (req, res, next) => {
-    console.log("logout fn() running...")
 
     res.clearCookie('token');
     return SendResponse(res, 200, 'Logout Successfull');
 
 }
 export const isAuthenticated = async (req, res, next) => {
-    console.log("isAuthenticated fn() running...")
 
     if (!req.cookies || !req.cookies.token) {
         return next(new AppError(401, "No token found. Authentication required."))

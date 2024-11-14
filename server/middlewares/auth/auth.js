@@ -6,7 +6,6 @@ import Blog from "../../models/blogModel.js"
 import Comment from "../../models/commentModel.js"
 
 export const isLoggedIn = async (req, res, next) => {
-    console.log("is logged in running...")
     if (!req.cookies || !req.cookies.token) {
         return next(new AppError(401, "No token found. Authentication required."))
     }
@@ -16,7 +15,7 @@ export const isLoggedIn = async (req, res, next) => {
         return next(new AppError(401, "Invalid Token, Authentication Required"))
     }
 
-    let user = await User.findById(validateCookieToken.payload).select("-password");
+    let user = await User.findById(validateCookieToken.payload).select("-password").populate('comments').populate('blogs');
     if (!user) {
         return next(404, "Invalid token, no user found");
     }
@@ -42,6 +41,17 @@ export const isCommentOwner = async (req, res, next) => {
 
     if (!comment.owner.equals(req.currentUser._id)) {
         return next(new AppError(403, "Access Denied"));
+    }
+
+    return next();
+}
+
+export const isAccountOwner = async (req,res,next) =>{
+    let currentUser = req.currentUser;
+    let { id } = req.params;
+
+    if(!currentUser._id.equals(id)){
+        return next(new AppError(403,"Access Denied"))
     }
 
     return next();
